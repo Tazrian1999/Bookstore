@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!--Extra-->
+<br/><br/><br/>
+<div class="container">
+    <br/>
+    <div class="card mb-3" style="max-width: 800px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img src="{{product.image.url}}" class="img-fluid rounded-start" alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <center>
+                        <h5 class="card-title">{{product.name}}</h5>
+                        <p class="card-text">{{product.description}}</p>
+
+                        {% if product.is_sale %}
+                        <strike>
+                            BDT {{product.price}}
+                            <br/>
+                        </strike>
+                        &nbsp;
+                        BDT{{product.sale_price}}
+                        <br/>
+                        {% else %}
+                        BDT{{product.price}}
+                        <br/>
+                        ID:{{product.id}}
+                        {% endif %}
+
+                        <br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">
+                            Home
+                        </a>
+                        <button type="button" value="{{product.id}}" class="btn btn-secondary" id="add-cart">
+                            Add To Cart
+                        </button>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    // Check if the button is pressed
+    var BDT = jQuery.noConflict();
+
+    BDT(document).on('click', '#add-cart', function (e) {
+        e.preventDefault();
+
+        // Get product ID from the button's value
+        var product_id = BDT(this).val();
+
+        BDT.ajax({
+            type: 'POST',
+            url: '{% url "cart_add" %}',
+            data: {
+                'product_id': product_id,
+                'action': 'post',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+
+            success: function (json) {
+                console.log(json); // Log the entire response to the console
+                document.getElementById('cart_quantity').textContent = json['Cart Quantity'];
+            },
+            
+
+            error: function (xhr, errmsg, err) {
+                // Handle error if needed
+                console.log(errmsg);
+            }
+        });
+    });
+</script>
+
+{% endblock %}
